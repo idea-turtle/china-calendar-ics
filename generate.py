@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parent
 CALENDAR_NAME = "中国节假日、农历节日和节气"
 UNPREFIXED_TITLE_REVISION = "20261109T073543Z"
 HOLIDAY_TITLE_REVISION = "20261109T074458Z"
+MAKEUP_TITLE_REVISION = "20261109T074644Z"
 DAY = timedelta(days=1)
 
 
@@ -31,10 +32,12 @@ class Event:
         if self.category in ("农历节日", "节气"):
             summary = self.name
             stamp = max(stamp, UNPREFIXED_TITLE_REVISION)
-        else:
-            suffix = "放假" if self.category == "放假" else "补班"
-            summary = f"{self.name}{suffix}"
+        elif self.category == "放假":
+            summary = f"{self.name}放假"
             stamp = max(stamp, HOLIDAY_TITLE_REVISION)
+        else:
+            summary = "补班"
+            stamp = max(stamp, MAKEUP_TITLE_REVISION)
         return [
             "BEGIN:VEVENT",
             f"UID:{uid}",
