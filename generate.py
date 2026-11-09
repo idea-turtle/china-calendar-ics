@@ -8,6 +8,7 @@ from uuid import NAMESPACE_URL, uuid5
 ROOT = Path(__file__).resolve().parent
 CALENDAR_NAME = "中国节假日、农历节日和节气"
 UNPREFIXED_TITLE_REVISION = "20261109T073543Z"
+HOLIDAY_TITLE_REVISION = "20261109T074458Z"
 DAY = timedelta(days=1)
 
 
@@ -31,7 +32,9 @@ class Event:
             summary = self.name
             stamp = max(stamp, UNPREFIXED_TITLE_REVISION)
         else:
-            summary = f"{self.category} · {self.name}"
+            suffix = "放假" if self.category == "放假" else "补班"
+            summary = f"{self.name}{suffix}"
+            stamp = max(stamp, HOLIDAY_TITLE_REVISION)
         return [
             "BEGIN:VEVENT",
             f"UID:{uid}",
