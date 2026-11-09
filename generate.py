@@ -7,6 +7,7 @@ from uuid import NAMESPACE_URL, uuid5
 
 ROOT = Path(__file__).resolve().parent
 CALENDAR_NAME = "中国节假日、农历节日和节气"
+UNPREFIXED_TITLE_REVISION = "20261109T073543Z"
 DAY = timedelta(days=1)
 
 
@@ -26,6 +27,11 @@ class Event:
             key += f"/{self.start.isoformat()}"
         uid = uuid5(NAMESPACE_URL, f"https://china-calendar-ics.invalid/{key}")
         stamp = self.updated.strftime("%Y%m%dT000000Z")
+        if self.category in ("农历节日", "节气"):
+            summary = self.name
+            stamp = max(stamp, UNPREFIXED_TITLE_REVISION)
+        else:
+            summary = f"{self.category} · {self.name}"
         return [
             "BEGIN:VEVENT",
             f"UID:{uid}",
@@ -33,7 +39,7 @@ class Event:
             f"LAST-MODIFIED:{stamp}",
             f"DTSTART;VALUE=DATE:{self.start:%Y%m%d}",
             f"DTEND;VALUE=DATE:{self.end:%Y%m%d}",
-            f"SUMMARY:{escape_text(f'{self.category} · {self.name}')}",
+            f"SUMMARY:{escape_text(summary)}",
             f"CATEGORIES:{escape_text(self.category)}",
             f"DESCRIPTION:{escape_text(f'日期来源：{self.source}')}",
             "TRANSP:TRANSPARENT",
